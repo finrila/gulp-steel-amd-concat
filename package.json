@@ -7,11 +7,7 @@
     "type": "git",
     "url": "https://github.com/finrila/gulp-steel-amd-concat"
   },
-  "author": {
-    "name": "Finrila",
-    "email": "finrila@gmail.com",
-    "url": "http://codezz.com"
-  },
+  "author": "Finrila <finrila@gmail.com> (http://codezz.com)",
   "engines": {
     "node": ">=0.10.0"
   },
@@ -28,7 +24,10 @@
     "through2": "^0.6.3",
     "gulp-util": "^3.0.2"
   },
-  "devDependencies": {
+  "devDependencies": {},
+  "homepage": "https://github.com/finrila/gulp-steel-amd-concat",
+  "bugs": {
+    "url": "https://github.com/finrila/gulp-steel-amd-concat/issues"
   },
-  "homepage": "https://github.com/finrila/gulp-steel-amd-concat"
+  "main": "index.js"
 }
