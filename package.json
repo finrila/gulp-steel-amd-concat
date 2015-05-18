@@ -1,22 +1,23 @@
 {
   "name": "gulp-steel-amd-concat",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "steel amd concat",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/finrila/gulp-steel-amd-concat"
   },
-  "author": "Finrila <finrila@gmail.com> (http://codezz.com)",
+  "author": {
+    "name": "Finrila",
+    "email": "finrila@gmail.com",
+    "url": "http://codezz.com"
+  },
   "engines": {
     "node": ">=0.10.0"
   },
   "scripts": {
     "test": ""
   },
-  "files": [
-    "index.js"
-  ],
   "keywords": [
     "steel"
   ],
@@ -24,10 +25,8 @@
     "through2": "^0.6.3",
     "gulp-util": "^3.0.2"
   },
-  "devDependencies": {},
-  "homepage": "https://github.com/finrila/gulp-steel-amd-concat",
-  "bugs": {
-    "url": "https://github.com/finrila/gulp-steel-amd-concat/issues"
+  "devDependencies": {
   },
-  "main": "index.js"
+  "main": "index.js",
+  "homepage": "https://github.com/finrila/gulp-steel-amd-concat"
 }
