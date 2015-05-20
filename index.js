@@ -1,5 +1,5 @@
 /**
- * 文件依赖的合并
+ * steel amd concat
  */
 'use strict';
 var through = require('through2');
@@ -36,11 +36,11 @@ module.exports = function(options) {
 
         // we dont do streams (yet)
         if (file.isStream()) {
-            this.emit('error', new PluginError('gulp-concat',  'Streaming not supported'));
+            this.emit('error', new PluginError('gulp-concat', 'Streaming not supported'));
             cb();
             return;
         }
-        
+
         var filepath = file.relative.replace(/\\/g, '/');
         var src = file.contents.toString('utf8');
         var match = src.match(new RegExp(definePrefix + '\\(["\\\'](.*?)[\\\'"]'));
@@ -54,9 +54,9 @@ module.exports = function(options) {
         }
         cb();
     }
+
     function endStream(cb) {
-        try{
-            //取得所有文件的直接依赖
+        try {
             for (var moduleId in moduleMap) {
                 requireModuleDeps(moduleId, moduleMap, excModule, moduleBasePath);
                 var file = moduleMap[moduleId].file;
@@ -64,36 +64,32 @@ module.exports = function(options) {
                 var src = moduleMap[moduleId].src;
                 // console.log('moduleId:', moduleId, 2222);
                 file.contents = new Buffer(concatModule(moduleId, moduleMap, excModule));
-                
+
                 this.push(file);
                 // requireModuleDeps(moduleId, moduleMap, excModule, moduleBasePath);
             }
-        } catch(e) {
+        } catch (e) {
             gutil.log(e);
-        }        
+        }
         cb();
     }
-    /**
-   * 合并入口方法
-   * @param {Object} moduleId
-   * @param {Object} moduleMap
-   * @param {Object} excModule
-   */
+
     function concatModule(moduleId, moduleMap, excModule) {
-        //取出模块内的自定义依赖
+        
         var deps = requireRegModuleDeps(moduleId, moduleMap, excModule);
         var ret = [];
-        //合并
+        
         deps.forEach(function(mid) {
             ret.push(moduleMap[mid].src);
         });
         return ret.join('\n');
     }
+
     function requireModuleDeps(moduleId, moduleMap, excModule) {
         var moduleObj = moduleMap[moduleId];
         // console.log('moduleId333:', moduleId, 333);
         if (!moduleObj) {
-           throw Error('moduleId(' + moduleId + ') requireModuleDeps error: module is not defined!');
+            throw Error('moduleId(' + moduleId + ') requireModuleDeps error: module is not defined!');
         }
         if (moduleObj.deps) {
             return moduleObj.deps;
@@ -121,6 +117,7 @@ module.exports = function(options) {
         });
         return moduleObj.deps;
     }
+
     function requireRegModuleDeps(moduleId, moduleMap, excModule) {
         var moduleObj = moduleMap[moduleId];
         if (!moduleObj) {
@@ -161,29 +158,24 @@ module.exports = function(options) {
         var allDeps = [moduleId];
 
         for (var mid in depsMap) {
-          allDeps.push(mid);
+            allDeps.push(mid);
         }
 
         return allDeps;
     }
 };
 
-
-/**
- * 去注释
- */
 function removeComment(src, options) {
     options = options || {
         line: true,
         block: true
     };
-    
+
     if (options.line) {
         src = src.replace(/(?:^|\n|\r)\s*\/\/.*(?:\r|\n|$)/gm, '\n');
     }
     if (options.block) {
-        src = src.replace(/(?:^|\n|\r)\s*\/\*[\s\S]*?\*\/\s*(?:\r|\n|$)/g, '\n'); 
+        src = src.replace(/(?:^|\n|\r)\s*\/\*[\s\S]*?\*\/\s*(?:\r|\n|$)/g, '\n');
     }
     return src;
 };
-    
