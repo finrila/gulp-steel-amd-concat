@@ -1,5 +1,6 @@
 /**
  * steel amd concat
+ * @author Finrila finrila@gmail.com
  */
 'use strict';
 var through = require('through2');
