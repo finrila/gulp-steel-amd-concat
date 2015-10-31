@@ -14,13 +14,11 @@ module.exports = function(options) {
 
     options = extend({
         definePrefix: 'steel.d',
-        moduleBase: 'src/js/',
         excModule: []
     }, options);
 
     var excModule = options.excModule;
     var definePrefix = options.definePrefix
-    var moduleBase = options.moduleBase;
     var moduleBasePath;
 
     return through.obj(bufferContents, endStream);
@@ -32,7 +30,7 @@ module.exports = function(options) {
             return;
         }
         if (!moduleBasePath) {
-            moduleBasePath = path.join(file.cwd, moduleBase).replace(/\\/g, '/');
+            moduleBasePath = file.base.replace(/\\/g, '/');
         }
 
         // we dont do streams (yet)
