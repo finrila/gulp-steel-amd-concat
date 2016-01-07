@@ -24,7 +24,6 @@ module.exports = function(options) {
     return through.obj(bufferContents, endStream);
 
     function bufferContents(file, enc, cb) {
-        // ignore empty files
         if (file.isNull()) {
             cb();
             return;
@@ -33,7 +32,6 @@ module.exports = function(options) {
             moduleBasePath = file.base.replace(/\\/g, '/');
         }
 
-        // we dont do streams (yet)
         if (file.isStream()) {
             this.emit('error', new PluginError('gulp-concat', 'Streaming not supported'));
             cb();
@@ -49,7 +47,6 @@ module.exports = function(options) {
                 src: src,
                 file: file
             };
-            // console.log(moduleMap[moduleId].file.path)
         }
         cb();
     }
@@ -61,11 +58,8 @@ module.exports = function(options) {
                 var file = moduleMap[moduleId].file;
                 var filepath = moduleMap[moduleId].file.path;
                 var src = moduleMap[moduleId].src;
-                // console.log('moduleId:', moduleId, 2222);
                 file.contents = new Buffer(concatModule(moduleId, moduleMap, excModule));
-
                 this.push(file);
-                // requireModuleDeps(moduleId, moduleMap, excModule, moduleBasePath);
             }
         } catch (e) {
             gutil.log(e);
@@ -77,7 +71,6 @@ module.exports = function(options) {
         
         var deps = requireRegModuleDeps(moduleId, moduleMap, excModule);
         var ret = [];
-        
         deps.forEach(function(mid) {
             ret.push(moduleMap[mid].src);
         });
@@ -86,15 +79,13 @@ module.exports = function(options) {
 
     function requireModuleDeps(moduleId, moduleMap, excModule) {
         var moduleObj = moduleMap[moduleId];
-        // console.log('moduleId333:', moduleId, 333);
         if (!moduleObj) {
             throw Error('moduleId(' + moduleId + ') requireModuleDeps error: module is not defined!');
         }
         if (moduleObj.deps) {
-            return moduleObj.deps;
+            return;
         }
-        moduleObj.deps = {};
-        // var fileFullPath = moduleObj.filepath;
+        var deps = [];
         var fileFullPath = moduleObj.file.path;
         var fileFolderPath = path.dirname(fileFullPath);
         var src = moduleObj.src;
@@ -108,13 +99,18 @@ module.exports = function(options) {
             if (excModule.indexOf(moduleId) != -1) {
                 return;
             }
-            moduleObj.deps[moduleId] = 1;
-            var _deps = requireModuleDeps(moduleId, moduleMap, excModule);
-            for (var mid in _deps) {
-                moduleObj.deps[mid] = 1;
+            requireModuleDeps(moduleId, moduleMap, excModule);
+            if (deps.indexOf(moduleId) === -1) {
+                var _deps = moduleMap[moduleId].deps;
+                for(var i = 0, l = _deps.length; i < l; ++i) {
+                    if (deps.indexOf(_deps[i]) === -1) {
+                        deps.push(_deps[i]);
+                    }
+                }
+                deps.push(moduleId);
             }
         });
-        return moduleObj.deps;
+        moduleObj.deps = deps;
     }
 
     function requireRegModuleDeps(moduleId, moduleMap, excModule) {
@@ -124,10 +120,9 @@ module.exports = function(options) {
         }
         var deps = moduleObj.deps;
         var moduleMiddleSrc = [moduleObj.src];
-        var depsMap = {};
-        for (var mid in deps) {
-            moduleMiddleSrc.push(moduleMap[mid].src);
-            depsMap[mid] = 1;
+        var all = deps.slice();
+        for(var i = 0, l = deps.length; i < l; ++i) {
+            moduleMiddleSrc.push(moduleMap[deps[i]].src);
         }
         moduleMiddleSrc = moduleMiddleSrc.join('\n');
 
@@ -147,20 +142,20 @@ module.exports = function(options) {
 
             for (var _moduleId in moduleMap) {
                 if (excModule.indexOf(moduleId) == -1 && reg.test(_moduleId)) {
-                    depsMap[_moduleId] = 1;
-                    for (var mid in moduleMap[_moduleId].deps) {
-                        depsMap[mid] = 1;
+                    if (all.indexOf(_moduleId) === -1) {
+                        var _deps = moduleMap[_moduleId].deps;
+                        for(var i = 0, l = _deps.length; i < l; ++i) {
+                            if (all.indexOf(_deps[i]) === -1) {
+                                all.push(_deps[i]);
+                            }
+                        }
+                        all.push(_moduleId);
                     }
                 }
             }
         }
-        var allDeps = [moduleId];
-
-        for (var mid in depsMap) {
-            allDeps.push(mid);
-        }
-
-        return allDeps;
+        all.push(moduleId);
+        return all;
     }
 };
 
