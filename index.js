@@ -90,7 +90,7 @@ module.exports = function(options) {
         var fileFolderPath = path.dirname(fileFullPath);
         var src = moduleObj.src;
 
-        removeComment(src).replace(/\brequire\(['"](.*?)['"]\)/g, function(_, moduleId) {
+        removeComment(src).replace(/\brequire\([ \t\n\r]*['"](.*?)['"][ \t\n\r]*\)/g, function(_, moduleId) {
 
             if (/^\./.test(moduleId)) {
                 moduleId = path.join(fileFolderPath, moduleId).replace(/\\/g, '/').replace(new RegExp('^' + moduleBasePath), '').replace(/^[\\\/]/, '');
@@ -130,7 +130,7 @@ module.exports = function(options) {
 
         removeComment(moduleMiddleSrc, {
             block: 1
-        }).replace(/\/\/\/require\(['"](.*?)['"]\)/g, function(_, moduleReg) {
+        }).replace(/\/\/\/require\([ \t\n\r]*['"](.*?)['"][ \t\n\r]*\)/g, function(_, moduleReg) {
             regList.push('(' + moduleReg.replace(/^\^/, '') + ')');
         });
 
