@@ -20,7 +20,6 @@ module.exports = function(options) {
     var excModule = options.excModule;
     var definePrefix = options.definePrefix
     var moduleBasePath;
-
     return through.obj(bufferContents, endStream);
 
     function bufferContents(file, enc, cb) {
@@ -33,7 +32,7 @@ module.exports = function(options) {
         }
 
         if (file.isStream()) {
-            this.emit('error', new PluginError('gulp-concat', 'Streaming not supported'));
+            this.emit('error', new gutil.PluginError('gulp-steel-amd-concat', 'Streaming not supported'));
             cb();
             return;
         }
@@ -54,11 +53,11 @@ module.exports = function(options) {
     function endStream(cb) {
         try {
             for (var moduleId in moduleMap) {
-                requireModuleDeps(moduleId, moduleMap, excModule, moduleBasePath);
+                requireModuleDeps.call(this, moduleId, moduleMap, excModule);
                 var file = moduleMap[moduleId].file;
                 var filepath = moduleMap[moduleId].file.path;
                 var src = moduleMap[moduleId].src;
-                file.contents = new Buffer(concatModule(moduleId, moduleMap, excModule));
+                file.contents = new Buffer(concatModule.call(this, moduleId, moduleMap, excModule));
                 this.push(file);
             }
         } catch (e) {
@@ -69,7 +68,7 @@ module.exports = function(options) {
 
     function concatModule(moduleId, moduleMap, excModule) {
         
-        var deps = requireRegModuleDeps(moduleId, moduleMap, excModule);
+        var deps = requireRegModuleDeps.call(this, moduleId, moduleMap, excModule);
         var ret = [];
         deps.forEach(function(mid) {
             ret.push(moduleMap[mid].src);
@@ -77,10 +76,12 @@ module.exports = function(options) {
         return ret.join('\n');
     }
 
-    function requireModuleDeps(moduleId, moduleMap, excModule) {
+    function requireModuleDeps(moduleId, moduleMap, excModule, dealFilePath) {
         var moduleObj = moduleMap[moduleId];
+        var _this = this;
         if (!moduleObj) {
-            throw Error('moduleId(' + moduleId + ') requireModuleDeps error: module is not defined!');
+            this.emit('error', new gutil.PluginError('gulp-steel-amd-concat', 'moduleId(' + moduleId + ') is not defined! In file (' + dealFilePath + ')'));
+            return;
         }
         if (moduleObj.deps) {
             return;
@@ -99,7 +100,7 @@ module.exports = function(options) {
             if (excModule.indexOf(moduleId) != -1) {
                 return;
             }
-            requireModuleDeps(moduleId, moduleMap, excModule);
+            requireModuleDeps.call(_this, moduleId, moduleMap, excModule, fileFullPath);
             if (deps.indexOf(moduleId) === -1) {
                 var _deps = moduleMap[moduleId].deps;
                 for(var i = 0, l = _deps.length; i < l; ++i) {
@@ -115,9 +116,6 @@ module.exports = function(options) {
 
     function requireRegModuleDeps(moduleId, moduleMap, excModule) {
         var moduleObj = moduleMap[moduleId];
-        if (!moduleObj) {
-            throw 'moduleId(' + moduleId + ') requireRegModuleDeps error: module is not defined!';
-        }
         var deps = moduleObj.deps;
         var moduleMiddleSrc = [moduleObj.src];
         var all = deps.slice();
@@ -137,7 +135,8 @@ module.exports = function(options) {
         var reg = regList.length && new RegExp('^' + regList.join('|'));
         if (reg) {
             if (reg.test(moduleId)) {
-                throw 'reg moduleId(' + moduleId + ') concat error://require("moduleReg") have circular reference->' + reg;
+                this.emit('error', new gutil.PluginError('gulp-steel-amd-concat', 'reg moduleId(' + moduleId + ') concat error://require("moduleReg") have circular reference->' + reg));
+                return;
             }
 
             for (var _moduleId in moduleMap) {
