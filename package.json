@@ -1,11 +1,11 @@
 {
   "name": "gulp-steel-amd-concat",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "steel amd concat",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/finrila/gulp-steel-amd-concat"
+    "url": "git+https://github.com/finrila/gulp-steel-amd-concat.git"
   },
   "author": {
     "name": "Finrila",
@@ -25,8 +25,16 @@
     "through2": "^0.6.3",
     "gulp-util": "^3.0.2"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "main": "index.js",
-  "homepage": "https://github.com/finrila/gulp-steel-amd-concat"
+  "homepage": "https://github.com/finrila/gulp-steel-amd-concat",
+  "readme": "\n# gulp-steel-amd-concat\n\n## 用途\n    把js文件进行合并处理，把当前js文件require或$Import的代码合并到一个js文件里。\n## 用法\n``` javascript\n    var steelAmdConcat = require('gulp-steel-amd-concat');\n    steelAmdConcat();\n```\n## 示例\n``` javascript\n    gulp.src(['src/js/**/*.js'])\n        .pipe(steelAmdConcat())\n        .pipe(gulp.dest('front_server/js/'));\n```\n\n\n",
+  "readmeFilename": "readme.md",
+  "gitHead": "1a2a2abfa745be5f2caae2e0c06abff6fb38a621",
+  "bugs": {
+    "url": "https://github.com/finrila/gulp-steel-amd-concat/issues"
+  },
+  "_id": "gulp-steel-amd-concat@0.0.7",
+  "_shasum": "b51b842ba1e3c6e920c5ba6a18471570cb805356",
+  "_from": "gulp-steel-amd-concat@*"
 }
